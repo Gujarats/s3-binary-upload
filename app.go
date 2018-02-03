@@ -7,19 +7,18 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path/filepath"
 
+	"github.com/Gujarats/logger"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 const (
-	S3_REGION = "ap-southeast-1"
-	S3_BUCKET = "s3-website-test.hashicorp.com"
+	S3_REGION      = "ap-southeast-1"
+	S3_BUCKET      = "s3-website-test.hashicorp.com"
+	gradleCacheDir = "/.gradle/caches/modules-2/files-2.1"
 )
-
-var gradleCacheDir = "~/.gradle/caches/modules-2/files-2.1"
 
 func main() {
 	// Create a single AWS session (we can re use this if we're uploading many files)
@@ -33,8 +32,7 @@ func main() {
 	var packageName string
 	_, err = fmt.Scan(&packageName)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	// list all the directory names
@@ -42,11 +40,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	// get specific directory for scanning artifact
 	packages := filterDir(packageNames, packageName)
+	logger.Debug("pacakges ", packages)
 	for _, pack := range packages {
-		files := getFilesFrom(pack)
+		files := getFilesPathFrom(pack)
+		logger.Debug("files = ", files)
 		for _, file := range files {
 			// Upload
 			err = AddFileToS3(s, file)
@@ -56,20 +55,6 @@ func main() {
 		}
 	}
 
-}
-
-func getFilesFrom(rootDir string) []string {
-	var files []string
-	filepath.Walk(gradleCacheDir+rootDir,
-		func(path string, f os.FileInfo, err error) error {
-			if !f.IsDir() {
-				files = append(files, path)
-			}
-			return nil
-		},
-	)
-
-	return files
 }
 
 // AddFileToS3 will upload a single file to S3, it will require a pre-built aws session
@@ -91,6 +76,8 @@ func AddFileToS3(s *session.Session, fileDir string) error {
 
 	// TODO modify the fileDirectory to custome dir so it can be downloaded using gradle
 	newFileDir := removeEncryptPath(fileDir)
+	logger.Debug("fileDir = ", fileDir)
+	logger.Debug("newFileDir = ", newFileDir)
 
 	// Config settings: this is where you choose the bucket, filename, content-type etc.
 	// of the file you're uploading.
