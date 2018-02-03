@@ -1,58 +1,80 @@
 package main
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestGetFolder(t *testing.T) {
 	testObjects := []struct {
 		source   string
 		expected []string
-		err      error
 	}{
 		{
 			source:   "com.helloworld.common.gradle",
 			expected: []string{"com", "helloworld", "common", "gradle"},
-			err:      nil,
 		},
 
 		{
 			source:   "com.helloworld.common.gradle/library",
 			expected: []string{"com", "helloworld", "common", "gradle", "library"},
-			err:      nil,
 		},
 
 		{
 			source:   "com.hello-world.common.gradle/library/java-plugin/4.10.0",
 			expected: []string{"com", "hello-world", "common", "gradle", "library", "java-plugin", "4.10.0"},
-			err:      nil,
 		},
 	}
 
 	for _, testObject := range testObjects {
 		actual := getFolder(testObject.source)
-		if !sliceString(testObject.expected, actual) {
+		if !reflect.DeepEqual(actual, testObject.expected) {
 			t.Errorf("expected = %+v, actual = %+v\n", testObject.expected, actual)
 		}
 	}
 }
-func sliceString(a, b []string) bool {
 
-	if a == nil && b == nil {
-		return true
+func TestFilterDir(t *testing.T) {
+	testObjects := []struct {
+		source   []byte
+		filter   string
+		expected []string
+	}{
+		{
+			source: []byte(`com.101tec
+com.amazonaws
+com.amazon.redshift
+com.android.databinding
+com.android.tools.jill
+com.android.tools.layoutlib
+com.android.tools.lint
+com.auth0
+com.beust
+com.boundary
+com.clearspring.analytics
+com.cloudbees
+com.cloudbees.thirdparty
+com.codahale.metrics
+com.codeborne
+com.cybozu.labs
+com.damnhandy
+com.datadoghq
+com.datastax.cassandra
+com.ecyrd.speed4j
+com.esotericsoftware.kryo
+com.esotericsoftware.minlog
+com.esotericsoftware.reflectasm
+com.factual
+com.fasterxml`),
+			filter:   "android",
+			expected: []string{"com.android.databinding", "com.android.tools.jill", "com.android.tools.layoutlib", "com.android.tools.lint"},
+		},
 	}
 
-	if a == nil || b == nil {
-		return false
-	}
-
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i := range a {
-		if a[i] != b[i] {
-			return false
+	for _, testObject := range testObjects {
+		actual := filterDir(testObject.source, testObject.filter)
+		if !reflect.DeepEqual(actual, testObject.expected) {
+			t.Errorf("expected = %+v, actual = %+v\n", testObject.expected, actual)
 		}
 	}
-
-	return true
 }

@@ -10,6 +10,10 @@ const (
 	dot       = "."
 )
 
+func getSourcePackage() []string {
+	return []string{}
+}
+
 // get root folder and subfolders from given path of artifact
 func getFolder(source string) []string {
 	var result []string
@@ -25,6 +29,18 @@ func getFolder(source string) []string {
 			result = append(result, splitDot)
 		}
 
+	}
+	return result
+}
+
+//TODO  filter all directory to specific package name
+func filterDir(source []byte, filter string) []string {
+	var result []string
+	directories := strings.Split(string(source), "\n")
+	for _, dir := range directories {
+		if strings.Contains(string(dir), filter) {
+			result = append(result, string(dir))
+		}
 	}
 	return result
 }
