@@ -19,7 +19,7 @@ func TestRemoveEncPath(t *testing.T) {
 	}
 
 	for _, testObject := range testObjects {
-		actual := removeEncPath(testObject.source)
+		actual := removeEncryptPath(testObject.source)
 		if actual != testObject.expected {
 			t.Errorf("expected = %+v, actual = %+v\n", testObject.expected, actual)
 		}

@@ -2,8 +2,7 @@ package main
 
 import "strings"
 
-func removeEncPath(pathFile string) string {
-
+func removeEncryptPath(pathFile string) string {
 	var result string
 	splitPathFiles := strings.Split(pathFile, backslash)
 	for index, splitPathFile := range splitPathFiles {
