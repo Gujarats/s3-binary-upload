@@ -36,16 +36,16 @@ func main() {
 	}
 
 	// list all the directory names
+	// TODO : ls command at specific directory not current directory
 	packageNames, err := exec.Command("ls").Output()
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	// get specific directory for scanning artifact
 	packages := filterDir(packageNames, packageName)
-	logger.Debug("pacakges ", packages)
 	for _, pack := range packages {
 		files := getFilesPathFrom(pack)
-		logger.Debug("files = ", files)
 		for _, file := range files {
 			// Upload
 			err = AddFileToS3(s, file)
@@ -74,8 +74,9 @@ func AddFileToS3(s *session.Session, fileDir string) error {
 	buffer := make([]byte, size)
 	file.Read(buffer)
 
-	// TODO modify the fileDirectory to custome dir so it can be downloaded using gradle
-	newFileDir := removeEncryptPath(fileDir)
+	// Modify the fileDirectory to custom dir so it can be downloaded by gradle
+	removedEncDir := removeEncryptPath(fileDir)
+	newFileDir := folderBuilder(removedEncDir)
 	logger.Debug("fileDir = ", fileDir)
 	logger.Debug("newFileDir = ", newFileDir)
 
