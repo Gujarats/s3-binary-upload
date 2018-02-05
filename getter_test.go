@@ -5,35 +5,6 @@ import (
 	"testing"
 )
 
-func TestGetFolder(t *testing.T) {
-	testObjects := []struct {
-		source   string
-		expected []string
-	}{
-		{
-			source:   "com.helloworld.common.gradle",
-			expected: []string{"com", "helloworld", "common", "gradle"},
-		},
-
-		{
-			source:   "com.helloworld.common.gradle/library",
-			expected: []string{"com", "helloworld", "common", "gradle", "library"},
-		},
-
-		{
-			source:   "com.hello-world.common.gradle/library/java-plugin/4.10.0",
-			expected: []string{"com", "hello-world", "common", "gradle", "library", "java-plugin", "4.10.0"},
-		},
-	}
-
-	for _, testObject := range testObjects {
-		actual := getFolder(testObject.source)
-		if !reflect.DeepEqual(actual, testObject.expected) {
-			t.Errorf("expected = %+v, actual = %+v\n", testObject.expected, actual)
-		}
-	}
-}
-
 func TestFilterDir(t *testing.T) {
 	testObjects := []struct {
 		source   []byte

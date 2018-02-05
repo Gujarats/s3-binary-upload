@@ -5,39 +5,15 @@ import (
 	"log"
 	"os"
 	"os/user"
-	"regexp"
 	"strings"
 
 	"github.com/kr/fs"
 )
 
 const (
-	backslash = "/"
-	dot       = "."
+	slash = "/"
+	dot   = "."
 )
-
-func getSourcePackage() []string {
-	return []string{}
-}
-
-// get root folder and subfolders from given path of artifact
-func getFolder(source string) []string {
-	var result []string
-	re := regexp.MustCompile("\\d")
-	splitBackslashes := strings.Split(source, backslash)
-	for _, splitBackslash := range splitBackslashes {
-		if re.MatchString(splitBackslash) {
-			result = append(result, splitBackslash)
-			continue
-		}
-		splitDots := strings.Split(splitBackslash, dot)
-		for _, splitDot := range splitDots {
-			result = append(result, splitDot)
-		}
-
-	}
-	return result
-}
 
 //filter all directory to specific package name
 func filterDir(source []byte, filter string) []string {
