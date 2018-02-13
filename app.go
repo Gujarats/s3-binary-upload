@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path"
 
 	"github.com/Gujarats/logger"
 	"github.com/aws/aws-sdk-go/aws"
@@ -19,6 +20,13 @@ const (
 	S3_BUCKET      = "s3-website-test.hashicorp.com"
 	gradleCacheDir = "/.gradle/caches/modules-2/files-2.1"
 )
+
+// TODO : put this in config file
+var S3_BUCKETS = []string{
+	"gujarats-test1",
+	"gujarats-test2",
+	"gujarats-test3",
+}
 
 func main() {
 	// Create a single AWS session (we can re use this if we're uploading many files)
@@ -35,31 +43,57 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// TODO : create a CLI app using cobra
+	// - create config file to specify s3 buckets single or multiple
+	// - speficy gradle cache location
+	// - upload binrary artifact to different s3 random or sequencial
+
+	// TODO : fast way
+	// - get all s3 and upload the files separately
+
 	// list all the directory names
-	// TODO : ls command at specific directory not current directory
-	packageNames, err := exec.Command("ls").Output()
+	command := exec.Command("ls")
+	command.Dir = path.Join(homeDir(), gradleCacheDir)
+	packageNames, err := command.Output()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// store arifact jar & pom
+	// key = artifact name prefix without extenstion like com.traveloka.common/accessor-1.0.2
+	// []string all files dir
+	artifacts := make(map[string][]string)
 
 	// get specific directory for scanning artifact
 	packages := filterDir(packageNames, packageName)
 	for _, pack := range packages {
 		files := getFilesPathFrom(pack)
 		for _, file := range files {
-			// Upload
-			err = AddFileToS3(s, file)
+			logger.Debug("file :: ", file)
+			artifactName := getArtifactName(file)
+			logger.Debug("artifacName :: ", artifactName)
+			// store artifact
+			artifacts[artifactName] = append(artifacts[artifactName], file)
+
+		}
+	}
+
+	// Upload
+	for _, artifact := range artifacts {
+		logger.Debug("artifact :: ", artifact)
+		s3Bucket := nextS3(S3_BUCKETS)
+		for _, fileDir := range artifact {
+			err = AddFileToS3(s, fileDir, s3Bucket)
 			if err != nil {
 				log.Fatal(err)
 			}
 		}
 	}
-
 }
 
 // AddFileToS3 will upload a single file to S3, it will require a pre-built aws session
 // and will set file info like content type and encryption on the uploaded file.
-func AddFileToS3(s *session.Session, fileDir string) error {
+func AddFileToS3(s *session.Session, fileDir string, s3Bucket string) error {
 
 	// Open the file for use
 	file, err := os.Open(fileDir)
@@ -77,13 +111,12 @@ func AddFileToS3(s *session.Session, fileDir string) error {
 	// Modify the fileDirectory to custom dir so it can be downloaded by gradle
 	removedEncDir := removeEncryptPath(fileDir)
 	newFileDir := folderBuilder(removedEncDir)
-	logger.Debug("fileDir = ", fileDir)
-	logger.Debug("newFileDir = ", newFileDir)
 
 	// Config settings: this is where you choose the bucket, filename, content-type etc.
 	// of the file you're uploading.
+
 	_, err = s3.New(s).PutObject(&s3.PutObjectInput{
-		Bucket:               aws.String(S3_BUCKET),
+		Bucket:               aws.String(s3Bucket),
 		Key:                  aws.String(newFileDir),
 		ACL:                  aws.String("private"),
 		Body:                 bytes.NewReader(buffer),
