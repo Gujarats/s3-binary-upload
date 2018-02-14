@@ -16,9 +16,14 @@ const (
 )
 
 //filter all directory to specific package name
+// if given filter equals to empty string then all package will be return
 func filterDir(source []byte, filter string) []string {
 	var result []string
 	directories := strings.Split(string(source), "\n")
+	if filter == "all" {
+		return directories
+	}
+
 	for _, dir := range directories {
 		if strings.Contains(string(dir), filter) {
 			result = append(result, string(dir))

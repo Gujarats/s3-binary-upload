@@ -40,6 +40,20 @@ com.fasterxml`),
 			filter:   "android",
 			expected: []string{"com.android.databinding", "com.android.tools.jill", "com.android.tools.layoutlib", "com.android.tools.lint"},
 		},
+
+		{
+			source: []byte(`com.101tec
+com.amazonaws
+com.android.tools.lint
+com.fasterxml`),
+			filter: "all",
+			expected: []string{
+				"com.101tec",
+				"com.amazonaws",
+				"com.android.tools.lint",
+				"com.fasterxml",
+			},
+		},
 	}
 
 	for _, testObject := range testObjects {
