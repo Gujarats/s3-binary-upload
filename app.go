@@ -69,12 +69,9 @@ func main() {
 	for _, pack := range packages {
 		files := getFilesPathFrom(pack)
 		for _, file := range files {
-			logger.Debug("file :: ", file)
 			artifactName := getArtifactName(file)
-			logger.Debug("artifacName :: ", artifactName)
 			// store artifact
 			artifacts[artifactName] = append(artifacts[artifactName], file)
-
 		}
 	}
 
@@ -111,6 +108,7 @@ func AddFileToS3(s *session.Session, fileDir string, s3Bucket string) error {
 	// Modify the fileDirectory to custom dir so it can be downloaded by gradle
 	removedEncDir := removeEncryptPath(fileDir)
 	newFileDir := folderBuilder(removedEncDir)
+	logger.Debug("newFileDir :: ", newFileDir)
 
 	// Config settings: this is where you choose the bucket, filename, content-type etc.
 	// of the file you're uploading.
