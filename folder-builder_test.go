@@ -18,6 +18,10 @@ func TestFolderBuilder(t *testing.T) {
 			source:   "com.helloworld.common.gradle/3.01/java.jar",
 			expected: "com/helloworld/common/gradle/3.01/java.jar",
 		},
+		{
+			source:   "com.helloworld.common.gradle/3.01.Final/java.jar",
+			expected: "com/helloworld/common/gradle/3.01.Final/java.jar",
+		},
 	}
 
 	for _, testObject := range testObjects {
@@ -28,29 +32,33 @@ func TestFolderBuilder(t *testing.T) {
 	}
 }
 
-func TestDotChanger(t *testing.T) {
+func TestRemoveDotToSlash(t *testing.T) {
 	testObjects := []struct {
 		source   string
 		expected []string
 	}{
-		{
-			source:   "com.helloworld.common.gradle",
-			expected: []string{"com", "helloworld", "common", "gradle"},
-		},
+		//{
+		//	source:   "com.helloworld.common.gradle",
+		//	expected: []string{"com", "helloworld", "common", "gradle"},
+		//},
 
-		{
-			source:   "com.helloworld.common.gradle/library",
-			expected: []string{"com", "helloworld", "common", "gradle", "library"},
-		},
+		//{
+		//	source:   "com.helloworld.common.gradle/library",
+		//	expected: []string{"com", "helloworld", "common", "gradle", "library"},
+		//},
 
-		{
-			source:   "com.hello-world.common.gradle/library/java-plugin/4.10.0",
-			expected: []string{"com", "hello-world", "common", "gradle", "library", "java-plugin", "4.10.0"},
-		},
+		//{
+		//	source:   "com.hello-world.common.gradle/library/java-plugin/4.10.0",
+		//	expected: []string{"com", "hello-world", "common", "gradle", "library", "java-plugin", "4.10.0"},
+		//},
 
+		//{
+		//	source:   "com.hello-world.p2p.gradle/library/java-plugin/4.10.0",
+		//	expected: []string{"com", "hello-world", "p2p", "gradle", "library", "java-plugin", "4.10.0"},
+		//},
 		{
-			source:   "com.hello-world.p2p.gradle/library/java-plugin/4.10.0",
-			expected: []string{"com", "hello-world", "p2p", "gradle", "library", "java-plugin", "4.10.0"},
+			source:   "com.hello-world.p2p.gradle/library/4.1.13.Final/checkout",
+			expected: []string{"com", "hello-world", "p2p", "gradle", "library", "4.1.13.Final", "checkout"},
 		},
 	}
 

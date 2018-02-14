@@ -20,10 +20,9 @@ func folderBuilder(source string) string {
 	return result
 }
 
-// get root folder and subfolders from given path of artifact
 func removeDotToSlash(source string) []string {
 	var result []string
-	re := regexp.MustCompile("^\\d+(\\.\\d+)*$")
+	re := regexp.MustCompile("^\\d+(\\.\\d+)*([a-zA-Z])*")
 	splitSlashes := strings.Split(source, slash)
 	for index, splitSlash := range splitSlashes {
 		// avoid splitting the dots for the filename
@@ -32,7 +31,7 @@ func removeDotToSlash(source string) []string {
 			continue
 		}
 
-		// avoid spliting removing the dot fro the number
+		// avoid spliting removing the dot for the number in folder name
 		if re.MatchString(splitSlash) {
 			result = append(result, splitSlash)
 			continue
