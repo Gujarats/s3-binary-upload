@@ -1,12 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"os"
 	"os/user"
 	"strings"
 
+	"github.com/Gujarats/logger"
 	"github.com/kr/fs"
 )
 
@@ -37,7 +36,7 @@ func getFilesPathFrom(path string) []string {
 	walker := fs.Walk(path)
 	for walker.Step() {
 		if err := walker.Err(); err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			logger.Debug("Walker :: ", err.Error())
 			continue
 		}
 

@@ -67,7 +67,8 @@ func main() {
 	// get specific directory for scanning artifact
 	packages := filterDir(packageNames, packageName)
 	for _, pack := range packages {
-		files := getFilesPathFrom(pack)
+		filePathPack := path.Join(homeDir(), gradleCacheDir, pack)
+		files := getFilesPathFrom(filePathPack)
 		for _, file := range files {
 			artifactName := getArtifactName(file)
 			// store artifact
@@ -95,6 +96,7 @@ func AddFileToS3(s *session.Session, fileDir string, s3Bucket string) error {
 	// Open the file for use
 	file, err := os.Open(fileDir)
 	if err != nil {
+		logger.Debug("Open file :: ", err.Error())
 		return err
 	}
 	defer file.Close()
