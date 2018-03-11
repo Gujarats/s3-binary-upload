@@ -10,20 +10,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 )
 
-//const (
-//	S3_REGION      = "ap-southeast-1"
-//	S3_BUCKET      = "s3-website-test.hashicorp.com"
-//	gradleCacheDir = "/.gradle/caches/modules-2/files-2.1"
-//)
-//
-//// TODO : put this in config file
-//var S3_BUCKETS = []string{
-//	//"gujarats-test1",
-//	//"gujarats-test2",
-//	//"gujarats-test3",
-//	"s3-website-test.hashicorp.com",
-//}
-
+// TODO ; upload the file wihtous cache
+// user can choose which artifact to upload in gradle cache
+// or specifically choose the path
 func main() {
 	config := getConfig()
 	// Create a single AWS session (we can re use this if we're uploading many files)
