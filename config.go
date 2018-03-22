@@ -7,10 +7,21 @@ import (
 )
 
 type Config struct {
-	S3Buckets      []string `viper:"s3Buckets"`
-	S3Bucket       string   `viper:"s3Bucket"`
-	Region         string   `viper:"region"`
-	GradleCacheDir string   `viper:"gradle"`
+	S3Buckets []string `viper:"s3Buckets"`
+	S3Bucket  string   `viper:"s3Bucket"`
+	Region    string   `viper:"region"`
+	Profile   string   `viper:"profile"`
+
+	GradleCacheDir string `viper:"gradle"`
+	ArtfactsDir    string `viper:"artfactsDir"`
+
+	UploadArtifacs   bool     `viper:"uploadArtifacs"`
+	DownloadArtifacs bool     `viper:"downloadArtifacs"`
+	LinkArtifacts    []string `viper:"linkArtifacts"`
+
+	// authentication for the provided link artifacts
+	Username string `viper:"username"`
+	Password string `viper:"password"`
 }
 
 func getConfig() *Config {
