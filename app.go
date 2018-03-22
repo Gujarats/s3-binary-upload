@@ -35,7 +35,8 @@ func main() {
 	}
 
 	if config.UploadArtifacs {
-		artifactsDir, _ := getArtifacsDir(config)
+		artifactsDir, isGradleDir := getArtifacsDir(config)
+
 		// get package name
 		fmt.Print("\nEnter your package = ")
 		var packageName string
@@ -59,20 +60,39 @@ func main() {
 
 		// get specific directory for scanning artifact
 		packages := filterDir(packageNames, packageName)
-		for _, pack := range packages {
-			files := getFilesPathFrom(pack)
-			for _, file := range files {
-				artifactName := getArtifactName(file)
-				// store artifact
-				artifacts[artifactName] = append(artifacts[artifactName], file)
-			}
-		}
 
-		// Upload
-		var buckets []string
-		buckets = append(buckets, config.S3Bucket)
-		buckets = append(buckets, config.S3Buckets...)
-		upload(sess, buckets, artifacts)
+		if isGradleDir {
+			for _, pack := range packages {
+				files := getFilesPathFrom(pack)
+				for _, file := range files {
+					artifactName := getArtifactNameForGradle(file)
+					// store artifact
+					artifacts[artifactName] = append(artifacts[artifactName], file)
+				}
+			}
+
+			// Upload
+			var buckets []string
+			buckets = append(buckets, config.S3Bucket)
+			buckets = append(buckets, config.S3Buckets...)
+			uploadFromGradleCache(sess, buckets, artifacts)
+		} else {
+			// not a gradle dir
+			for _, pack := range packages {
+				files := getFilesPathFrom(pack)
+				for _, file := range files {
+					artifactName := getArtifactName(file)
+					// store artifact
+					artifacts[artifactName] = append(artifacts[artifactName], file)
+				}
+			}
+
+			// Upload
+			var buckets []string
+			buckets = append(buckets, config.S3Bucket)
+			buckets = append(buckets, config.S3Buckets...)
+			upload(sess, buckets, artifacts)
+		}
 	}
 }
 
