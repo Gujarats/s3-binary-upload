@@ -35,7 +35,7 @@ func main() {
 	}
 
 	if config.UploadArtifacs {
-		artifactsDir, isGradleDir := getArtifacsDir(config)
+		artifactsDir, isGradleDir := getArtifactsDir(config)
 
 		// get package name
 		fmt.Print("\nEnter your package = ")
@@ -96,7 +96,7 @@ func main() {
 	}
 }
 
-func getArtifacsDir(config *Config) (string, bool) {
+func getArtifactsDir(config *Config) (string, bool) {
 	var fromGradle bool
 	if config.ArtfactsDir != "" {
 		return config.ArtfactsDir, fromGradle
