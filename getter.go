@@ -70,8 +70,7 @@ func getArtifactName(fileDir string) string {
 }
 
 func getArtifactNameForGradle(fileDir string) string {
-	parts := strings.Split(fileDir, ".")
-	result := strings.Join(parts[:len(parts)-1], ".")
+	result := getArtifactName(fileDir)
 	result = removeEncryptPath(result)
 	return result
 }
