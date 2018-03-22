@@ -61,43 +61,26 @@ func main() {
 		// get specific directory for scanning artifact
 		packages := filterDir(packageNames, packageName)
 
-		if isGradleDir {
-			for _, pack := range packages {
-				files := getFilesPathFrom(pack)
-				for _, file := range files {
-					artifactName := getArtifactNameForGradle(file)
-					// store artifact
-					artifacts[artifactName] = append(artifacts[artifactName], file)
-				}
+		// not a gradle dir
+		for _, pack := range packages {
+			files := getFilesPathFrom(pack)
+			for _, file := range files {
+				artifactName := getArtifactName(file)
+				// store artifact
+				artifacts[artifactName] = append(artifacts[artifactName], file)
 			}
-
-			// Upload
-			var buckets []string
-			buckets = append(buckets, config.S3Bucket)
-			buckets = append(buckets, config.S3Buckets...)
-			uploadFromGradleCache(sess, buckets, artifacts)
-		} else {
-			// not a gradle dir
-			for _, pack := range packages {
-				files := getFilesPathFrom(pack)
-				for _, file := range files {
-					artifactName := getArtifactName(file)
-					// store artifact
-					artifacts[artifactName] = append(artifacts[artifactName], file)
-				}
-			}
-
-			// Upload
-			var buckets []string
-			buckets = append(buckets, config.S3Bucket)
-			buckets = append(buckets, config.S3Buckets...)
-			upload(sess, buckets, artifacts)
 		}
+
+		// Upload
+		var buckets []string
+		buckets = append(buckets, config.S3Bucket)
+		buckets = append(buckets, config.S3Buckets...)
+		upload(sess, buckets, artifacts, isGradleDir)
 	}
 }
 
 func getArtifactsDir(config *Config) (string, bool) {
-	var fromGradle bool
+	fromGradle := false
 	if config.ArtfactsDir != "" {
 		return config.ArtfactsDir, fromGradle
 	} else if config.GradleCacheDir != "" {
