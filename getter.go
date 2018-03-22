@@ -57,8 +57,10 @@ func homeDir() string {
 	return usr.HomeDir
 }
 
+//TODO : move path of gradle caches to somewhere else
+// because the path could change
 func getGradleCacheDir() string {
-	return homeDir() + gradleCacheDir
+	return homeDir() + "/.gradle/caches/modules-2/files-2.1"
 }
 
 func getArtifactName(fileDir string) string {
