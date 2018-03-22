@@ -88,7 +88,7 @@ func TestGetArtifactName(t *testing.T) {
 	}
 
 	for _, testObject := range testObjects {
-		actual := getArtifactName(testObject.source)
+		actual := getArtifactNameForGradle(testObject.source)
 		if actual != testObject.expected {
 			t.Errorf("expected = %+v, actual = %+v\n", testObject.expected, actual)
 		}

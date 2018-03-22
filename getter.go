@@ -66,6 +66,12 @@ func getGradleCacheDir() string {
 func getArtifactName(fileDir string) string {
 	parts := strings.Split(fileDir, ".")
 	result := strings.Join(parts[:len(parts)-1], ".")
+	return result
+}
+
+func getArtifactNameForGradle(fileDir string) string {
+	parts := strings.Split(fileDir, ".")
+	result := strings.Join(parts[:len(parts)-1], ".")
 	result = removeEncryptPath(result)
 	return result
 }
