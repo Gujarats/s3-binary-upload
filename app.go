@@ -11,9 +11,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 )
 
-// TODO ; upload the file wihtous cache
-// user can choose which artifact to upload in gradle cache
-// or specifically choose the path
 func main() {
 	config := getConfig()
 	sess, err := session.NewSession(
