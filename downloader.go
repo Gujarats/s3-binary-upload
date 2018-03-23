@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -35,14 +36,22 @@ func Downloader(links []string, username, password string) {
 
 	for _, link := range links {
 		fmt.Println("downloading all artifacts from = ", link)
-		runCommand(app, accept, acceptValues, user, userValue, passwordOpt, passwordValue, mirror, pageRequisite, adjustExtensions, convertLinks, backupConverted, noParentDir, noHost, link)
+		runCommand(app, "", false, accept, acceptValues, user, userValue, passwordOpt, passwordValue, mirror, pageRequisite, adjustExtensions, convertLinks, backupConverted, noParentDir, noHost, link)
 	}
 
 	fmt.Println("all download success")
 }
 
-func runCommand(cmdName string, arg ...string) []byte {
+// parameter print will determine we output the result or not
+func runCommand(cmdName string, dir string, print bool, arg ...string) []byte {
 	cmd := exec.Command(cmdName, arg...)
+
+	var stdout bytes.Buffer
+	if print {
+		cmd.Stdout = &stdout
+		cmd.Stderr = os.Stderr
+		cmd.Stdin = os.Stdin
+	}
 
 	err := cmd.Run()
 	if err != nil {
@@ -50,6 +59,6 @@ func runCommand(cmdName string, arg ...string) []byte {
 		os.Exit(1)
 	}
 
-	return []byte(``)
+	return stdout.Bytes()
 
 }
