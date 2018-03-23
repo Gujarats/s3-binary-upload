@@ -28,7 +28,7 @@ func upload(s *session.Session, config *Config, buckets []string, artifacts map[
 				logger.Debug("newFileDir :: ", newFileDir)
 				fileDir = newFileDir
 			} else {
-				removeDir := path.Join(getHomeDir(), config.ArtifactsLocation)
+				removeDir := path.Join(getHomeDir(), configLocation)
 				splitRemoveDir := strings.Split(removeDir, "/")
 				lengthRemoveDir := len(splitRemoveDir)
 

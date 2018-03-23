@@ -8,6 +8,7 @@ import (
 
 const (
 	gradleCacheDir = "/.gradle/caches/modules-2/files-2.1"
+	configLocation = ".s3-binary-upload"
 )
 
 type Config struct {
@@ -19,10 +20,9 @@ type Config struct {
 	GradleCacheDir      []string `viper:"gradle"`
 	ArtfactsDirectories []string `viper:"artfactsDirectories"`
 
-	UploadArtifacs    bool     `viper:"uploadArtifacs"`
-	DownloadArtifacs  bool     `viper:"downloadArtifacs"`
-	ArtifactsLocation string   `viper:"artifactsLocation"`
-	LinkArtifacts     []string `viper:"linkArtifacts"`
+	UploadArtifacs   bool     `viper:"uploadArtifacs"`
+	DownloadArtifacs bool     `viper:"downloadArtifacs"`
+	LinkArtifacts    []string `viper:"linkArtifacts"`
 
 	// authentication for the provided link artifacts
 	Username string `viper:"username"`
@@ -31,7 +31,7 @@ type Config struct {
 
 func getConfig() *Config {
 	viper.SetConfigName("config")                  // name of config file (without extension)
-	viper.AddConfigPath("$HOME/.s3-binary-upload") // call multiple times to add many search paths
+	viper.AddConfigPath("$HOME/" + configLocation) // call multiple times to add many search paths
 	viper.AddConfigPath(".")                       // optionally look for config in the working directory
 	err := viper.ReadInConfig()                    // Find and read the config file
 	if err != nil {                                // Handle errors reading the config file

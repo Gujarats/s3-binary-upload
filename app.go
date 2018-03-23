@@ -35,6 +35,8 @@ func main() {
 		artifactsDirectories, isGradleDir := getArtifactsDir(config)
 
 		// get package name
+		// use `all` to upload all packages
+		// this is used for filter which package you want to upload by using prefix path eg: com or org
 		fmt.Print("\nEnter your package = ")
 		var packageName string
 		_, err = fmt.Scan(&packageName)
@@ -46,7 +48,7 @@ func main() {
 		var currentDir string
 		for _, artifactsDir := range artifactsDirectories {
 			// list all the directory names
-			currentDir = path.Join(getHomeDir(), config.ArtifactsLocation, artifactsDir)
+			currentDir = path.Join(getHomeDir(), configLocation, artifactsDir)
 			logger.Debug("currentDir :: ", currentDir)
 
 			result := runCommand("ls", currentDir, false)
