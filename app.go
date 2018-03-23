@@ -49,7 +49,7 @@ func main() {
 			currentDir = path.Join(getHomeDir(), config.ArtifactsLocation, artifactsDir)
 			logger.Debug("currentDir :: ", currentDir)
 
-			result := runCommand("ls", currentDir, true)
+			result := runCommand("ls", currentDir, false)
 
 			// create directory builder here
 			fullDir := directoryBuilder(currentDir, result)
@@ -80,7 +80,7 @@ func main() {
 		var buckets []string
 		buckets = append(buckets, config.S3Bucket)
 		buckets = append(buckets, config.S3Buckets...)
-		upload(sess, buckets, artifacts, isGradleDir)
+		upload(sess, config, buckets, artifacts, isGradleDir)
 	}
 }
 

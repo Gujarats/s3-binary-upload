@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
+	"strings"
 
 	"github.com/Gujarats/logger"
 	"github.com/aws/aws-sdk-go/aws"
@@ -13,9 +15,8 @@ import (
 )
 
 // pass buckets to uploader to start uploading
-func upload(s *session.Session, buckets []string, artifacts map[string][]string, isGradleDir bool) {
+func upload(s *session.Session, config *Config, buckets []string, artifacts map[string][]string, isGradleDir bool) {
 	for _, artifact := range artifacts {
-		logger.Debug("artifact :: ", artifact)
 		s3Bucket := nextS3(buckets)
 		for _, fileDir := range artifact {
 			buffer, contentLength := getFileSize(fileDir)
@@ -26,7 +27,17 @@ func upload(s *session.Session, buckets []string, artifacts map[string][]string,
 				newFileDir := folderBuilder(removedEncDir)
 				logger.Debug("newFileDir :: ", newFileDir)
 				fileDir = newFileDir
+			} else {
+				removeDir := path.Join(getHomeDir(), config.ArtifactsLocation)
+				splitRemoveDir := strings.Split(removeDir, "/")
+				lengthRemoveDir := len(splitRemoveDir)
+
+				finalPath := strings.Split(fileDir, "/")
+				// TODO :: refactor this so we don't need to hardcode +2
+				fileDir = path.Join(finalPath[lengthRemoveDir+2:]...)
 			}
+
+			logger.Debug("fileDir final :: ", fileDir)
 
 			err := addFileToS3(s, buffer, contentLength, fileDir, s3Bucket)
 			if err != nil {

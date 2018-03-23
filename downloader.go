@@ -47,8 +47,9 @@ func runCommand(cmdName string, dir string, print bool, arg ...string) []byte {
 	cmd := exec.Command(cmdName, arg...)
 
 	var stdout bytes.Buffer
+	cmd.Stdout = &stdout
+
 	if print {
-		cmd.Stdout = &stdout
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
 	}
