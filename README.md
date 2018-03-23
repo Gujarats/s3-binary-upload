@@ -31,7 +31,20 @@ NOTE use `all` to upload all artifact
 
 ```yaml
 ---
-region: ap-southeast-1
-s3Bucket: artifact-repository-test1
+region: your-region 
+s3Bucket: your-bucket 
+profile: your-aws-profile 
+
+artfactsDirectories:
+  - /artifactory/ext-release-local/
+  - /artifactory/libs-release-local/
+
+uploadArtifacs: true
+downloadArtifacs: false
+linkArtifacts:
+  - https://your-artifact-host/artifactory/ext-release-local/
+  - https://your-artifact-host/artifactory/libs-release-local/
+username: username-for-your-host
+password: password 
 
 ```
