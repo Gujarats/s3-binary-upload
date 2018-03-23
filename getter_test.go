@@ -70,6 +70,37 @@ func TestGetArtifactName(t *testing.T) {
 		expected string
 	}{
 		{
+			source:   "com.helloworld.common.gradle/3.01/java.jar",
+			expected: "com.helloworld.common.gradle/3.01/java",
+		},
+		{
+			source:   "com.helloworld.common.gradle/3.01/java.pom",
+			expected: "com.helloworld.common.gradle/3.01/java",
+		},
+		{
+			source:   "com.helloworld.common.gradle/3.01/accessor-1.0.2.jar",
+			expected: "com.helloworld.common.gradle/3.01/accessor-1.0.2",
+		},
+		{
+			source:   "com.helloworld.common.gradle/3.01/accessor-1.0.2.pom",
+			expected: "com.helloworld.common.gradle/3.01/accessor-1.0.2",
+		},
+	}
+
+	for _, testObject := range testObjects {
+		actual := getArtifactName(testObject.source)
+		if actual != testObject.expected {
+			t.Errorf("expected = %+v, actual = %+v\n", testObject.expected, actual)
+		}
+	}
+}
+
+func TestGetArtifactNameForGradle(t *testing.T) {
+	testObjects := []struct {
+		source   string
+		expected string
+	}{
+		{
 			source:   "com.helloworld.common.gradle/3.01/11111/java.jar",
 			expected: "com.helloworld.common.gradle/3.01/java",
 		},
@@ -88,7 +119,7 @@ func TestGetArtifactName(t *testing.T) {
 	}
 
 	for _, testObject := range testObjects {
-		actual := getArtifactName(testObject.source)
+		actual := getArtifactNameForGradle(testObject.source)
 		if actual != testObject.expected {
 			t.Errorf("expected = %+v, actual = %+v\n", testObject.expected, actual)
 		}
