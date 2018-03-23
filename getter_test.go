@@ -125,3 +125,34 @@ func TestGetArtifactNameForGradle(t *testing.T) {
 		}
 	}
 }
+
+func TestGetArtifactsDir(t *testing.T) {
+	testObjects := []struct {
+		config    *Config
+		expected1 []string
+		expected2 bool
+	}{
+		{
+			config: &Config{
+				ArtfactsDirectories: []string{"path1", "path2"},
+			},
+			expected1: []string{"path1", "path2"},
+			expected2: false,
+		},
+
+		{
+			config: &Config{
+				GradleCacheDir: []string{"path1", "path2"},
+			},
+			expected1: []string{"path1", "path2"},
+			expected2: true,
+		},
+	}
+
+	for _, testObject := range testObjects {
+		_, result2 := getArtifactsDir(testObject.config)
+		if result2 != testObject.expected2 {
+			t.Errorf("expected = %+v, actual = %+v\n", testObject.expected2, result2)
+		}
+	}
+}

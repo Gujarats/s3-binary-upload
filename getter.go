@@ -97,3 +97,15 @@ func getCurrentDir() string {
 
 	return dir
 }
+
+func getArtifactsDir(config *Config) ([]string, bool) {
+	fromGradle := false
+	if len(config.ArtfactsDirectories) > 0 {
+		return config.ArtfactsDirectories, fromGradle
+	} else if len(config.GradleCacheDir) > 0 {
+		fromGradle = true
+		return config.GradleCacheDir, fromGradle
+	}
+
+	return []string{}, fromGradle
+}
