@@ -8,21 +8,34 @@ import (
 
 func Downloader(links []string, username, password string) {
 
+	// full command
+	//wget -A jar,pom,xml,md5,sha1 -m -p -E -k -K -np -nH --user YOUR_USER --password YOUR_PASS YOUR_URL
 	app := "wget"
+
+	accept := "-A"
+	acceptValues := "jar,pom,xml,md5,sha1"
+
+	// authentication
 	user := "--user"
 	userValue := username
 	passwordOpt := "--password"
 	passwordValue := password
-	recursive := "-r"
-	exclude := "-R"
-	excludeValue := "index.html*"
+
+	//required options
+	mirror := "-m"
+	pageRequisite := "-p"
+	adjustExtensions := "-E"
+	convertLinks := "-k"
+	backupConverted := "-K"
+	//recursive := "-r"
+	//exclude := "-R"
+	//excludeValue := "index.html*"
 	noParentDir := "-np"
-	noOverwrite := "-nc"
 	noHost := "-nH"
 
 	for _, link := range links {
 		fmt.Println("downloading all artifacts from = ", link)
-		runCommand(app, user, userValue, passwordOpt, passwordValue, recursive, exclude, excludeValue, noParentDir, noOverwrite, noHost, link)
+		runCommand(app, accept, acceptValues, user, userValue, passwordOpt, passwordValue, mirror, pageRequisite, adjustExtensions, convertLinks, backupConverted, noParentDir, noHost, link)
 	}
 
 	fmt.Println("all download success")
