@@ -21,30 +21,46 @@ func upload(s *session.Session, config *Config, buckets []string, artifacts map[
 		for _, fileDir := range artifact {
 			buffer, contentLength := getFileSize(fileDir)
 
-			// change fileDir from gralde to make it downloadable by gradle
-			if isGradleDir {
-				removedEncDir := removeEncryptPath(fileDir)
-				newFileDir := folderBuilder(removedEncDir)
-				logger.Debug("newFileDir :: ", newFileDir)
-				fileDir = newFileDir
-			} else {
-				removeDir := path.Join(getHomeDir(), configLocation)
-				splitRemoveDir := strings.Split(removeDir, "/")
-				lengthRemoveDir := len(splitRemoveDir)
+			dirForS3 := dirBuilderForS3(isGradleDir, fileDir)
+			logger.Debug("fileDir final :: ", dirForS3)
 
-				finalPath := strings.Split(fileDir, "/")
-				// TODO :: refactor this so we don't need to hardcode +2
-				fileDir = path.Join(finalPath[lengthRemoveDir+2:]...)
-			}
-
-			logger.Debug("fileDir final :: ", fileDir)
-
-			err := addFileToS3(s, buffer, contentLength, fileDir, s3Bucket)
+			err := addFileToS3(s, buffer, contentLength, dirForS3, s3Bucket)
 			if err != nil {
 				log.Fatal(err)
 			}
 		}
 	}
+}
+
+// This Will create directory for artifacts so it can be downloaded by gradle
+// by following maven repository convention
+// directory is the current dir for artifacts in local disk
+func dirBuilderForS3(isGradleDir bool, directory string) string {
+	var result string
+
+	// change fileDir from gralde to make it downloadable by gradle
+	if isGradleDir {
+		removeDir := path.Join(getHomeDir(), gradleCacheDir)
+		splitRemoveDir := strings.Split(removeDir, "/")
+		lengthRemoveDir := len(splitRemoveDir)
+
+		fullPath := strings.Split(directory, "/")
+		dirWithoutGradleCache := path.Join(fullPath[lengthRemoveDir:]...)
+
+		removedEncDir := removeEncryptPath(dirWithoutGradleCache)
+		newFileDir := folderBuilder(removedEncDir)
+		result = newFileDir
+	} else {
+		removeDir := path.Join(getHomeDir(), configLocation)
+		splitRemoveDir := strings.Split(removeDir, "/")
+		lengthRemoveDir := len(splitRemoveDir)
+
+		finalPath := strings.Split(directory, "/")
+		// TODO :: refactor this so we don't need to hardcode +2
+		result = path.Join(finalPath[lengthRemoveDir+2:]...)
+	}
+
+	return result
 }
 
 // Open the given path of file
