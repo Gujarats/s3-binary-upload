@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
-	"os/exec"
 	"path"
 
+	"github.com/Gujarats/logger"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -32,7 +32,7 @@ func main() {
 	}
 
 	if config.UploadArtifacs {
-		artifactsDir, isGradleDir := getArtifactsDir(config)
+		artifactsDirectories, isGradleDir := getArtifactsDir(config)
 
 		// get package name
 		fmt.Print("\nEnter your package = ")
@@ -42,13 +42,21 @@ func main() {
 			log.Fatal(err)
 		}
 
-		// list all the directory names
-		command := exec.Command("ls")
-		command.Dir = path.Join(homeDir(), artifactsDir)
-		packageNames, err := command.Output()
-		if err != nil {
-			log.Fatal(err)
+		var packageNames []string
+		var currentDir string
+		for _, artifactsDir := range artifactsDirectories {
+			// list all the directory names
+			currentDir = path.Join(getHomeDir(), config.ArtifactsLocation, artifactsDir)
+			logger.Debug("currentDir :: ", currentDir)
+
+			result := runCommand("ls", currentDir, true)
+
+			// create directory builder here
+			fullDir := directoryBuilder(currentDir, result)
+			packageNames = append(packageNames, fullDir...)
 		}
+
+		logger.Debug("packageNames :: ", packageNames)
 
 		// store arifact jar & pom
 		// key = artifact name prefix without extenstion like com.traveloka.common/accessor-1.0.2
@@ -56,10 +64,10 @@ func main() {
 		artifacts := make(map[string][]string)
 
 		// get specific directory for scanning artifact
-		packages := filterDir(packageNames, packageName)
+		//packages := filterDir(firtsDirPackageNames, packageName)
+		//logger.Debug("packages result :: ", packages)
 
-		// not a gradle dir
-		for _, pack := range packages {
+		for _, pack := range packageNames {
 			files := getFilesPathFrom(pack)
 			for _, file := range files {
 				artifactName := getArtifactName(file)
@@ -76,14 +84,14 @@ func main() {
 	}
 }
 
-func getArtifactsDir(config *Config) (string, bool) {
+func getArtifactsDir(config *Config) ([]string, bool) {
 	fromGradle := false
-	if config.ArtfactsDir != "" {
-		return config.ArtfactsDir, fromGradle
-	} else if config.GradleCacheDir != "" {
+	if len(config.ArtfactsDirectories) > 0 {
+		return config.ArtfactsDirectories, fromGradle
+	} else if len(config.GradleCacheDir) > 0 {
 		fromGradle = true
 		return config.GradleCacheDir, fromGradle
 	}
 
-	return "", fromGradle
+	return []string{}, fromGradle
 }
