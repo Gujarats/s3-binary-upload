@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 )
 
-func Downloader(links []string, username, password string) {
+func Downloader(links []string, username, pass string) {
 
 	// full command
 	//wget -A jar,pom,xml,md5,sha1 -m -p -E -k -K -np -nH --user YOUR_USER --password YOUR_PASS YOUR_URL
@@ -19,8 +20,8 @@ func Downloader(links []string, username, password string) {
 	// authentication
 	user := "--user"
 	userValue := username
-	passwordOpt := "--password"
-	passwordValue := password
+	password := "--password"
+	passwordValue := pass
 
 	//required options
 	mirror := "-m"
@@ -28,15 +29,14 @@ func Downloader(links []string, username, password string) {
 	adjustExtensions := "-E"
 	convertLinks := "-k"
 	backupConverted := "-K"
-	//recursive := "-r"
-	//exclude := "-R"
-	//excludeValue := "index.html*"
 	noParentDir := "-np"
 	noHost := "-nH"
+	directoryPrefix := "-P"
+	directoryPrefixValue := path.Join(getHomeDir(), ".s3-binary-upload")
 
 	for _, link := range links {
 		fmt.Println("downloading all artifacts from = ", link)
-		runCommand(app, "", false, accept, acceptValues, user, userValue, passwordOpt, passwordValue, mirror, pageRequisite, adjustExtensions, convertLinks, backupConverted, noParentDir, noHost, link)
+		runCommand(app, "", false, accept, acceptValues, user, userValue, password, passwordValue, directoryPrefix, directoryPrefixValue, mirror, pageRequisite, adjustExtensions, convertLinks, backupConverted, noParentDir, noHost, link)
 	}
 
 	fmt.Println("all download success")
@@ -48,6 +48,10 @@ func runCommand(cmdName string, dir string, print bool, arg ...string) []byte {
 
 	var stdout bytes.Buffer
 	cmd.Stdout = &stdout
+
+	if dir != "" {
+		cmd.Dir = dir
+	}
 
 	if print {
 		cmd.Stderr = os.Stderr
