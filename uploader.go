@@ -22,7 +22,6 @@ func upload(s *session.Session, config *Config, buckets []string, artifacts map[
 			buffer, contentLength := getFileSize(fileDir)
 
 			dirForS3 := dirBuilderForS3(isGradleDir, fileDir)
-			logger.Debug("fileDir final :: ", dirForS3)
 
 			err := addFileToS3(s, buffer, contentLength, dirForS3, s3Bucket)
 			if err != nil {
@@ -89,18 +88,32 @@ func getFileSize(fileDir string) ([]byte, int64) {
 // fileDir would be the path of S3 to place the file
 func addFileToS3(s *session.Session, buffer []byte, contentLength int64, fileDir string, s3Bucket string) error {
 
-	// Config settings: this is where you choose the bucket, filename, content-type etc.
-	// of the file you're uploading.
-	_, err := s3.New(s).PutObject(&s3.PutObjectInput{
-		Bucket:               aws.String(s3Bucket),
-		Key:                  aws.String(fileDir),
-		ACL:                  aws.String("private"),
-		Body:                 bytes.NewReader(buffer),
-		ContentLength:        aws.Int64(contentLength),
-		ContentType:          aws.String(http.DetectContentType(buffer)),
-		ContentDisposition:   aws.String("attachment"),
-		ServerSideEncryption: aws.String("AES256"),
+	object, err := s3.New(s).GetObject(&s3.GetObjectInput{
+		Bucket: aws.String(s3Bucket),
+		Key:    aws.String(fileDir),
 	})
 
-	return err
+	//upload new file if objects is not exist
+	if err != nil || *object.ContentLength <= 0 {
+
+		logger.Debug("fileDir upload :: ", fileDir)
+
+		// upload the file with given buffer and key
+		_, err := s3.New(s).PutObject(&s3.PutObjectInput{
+			Bucket:               aws.String(s3Bucket),
+			Key:                  aws.String(fileDir),
+			ACL:                  aws.String("private"),
+			Body:                 bytes.NewReader(buffer),
+			ContentLength:        aws.Int64(contentLength),
+			ContentType:          aws.String(http.DetectContentType(buffer)),
+			ContentDisposition:   aws.String("attachment"),
+			ServerSideEncryption: aws.String("AES256"),
+		})
+
+		return err
+	}
+
+	logger.Debug("fileDir skipped :: ", fileDir)
+
+	return nil
 }
