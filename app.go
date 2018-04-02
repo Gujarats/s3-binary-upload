@@ -5,7 +5,6 @@ import (
 	"log"
 	"path"
 
-	"github.com/Gujarats/logger"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -49,7 +48,6 @@ func main() {
 		for _, artifactsDir := range artifactsDirectories {
 			// list all the directory names
 			currentDir = path.Join(getHomeDir(), configLocation, artifactsDir)
-			logger.Debug("currentDir :: ", currentDir)
 
 			result := runCommand("ls", currentDir, false)
 
@@ -58,16 +56,10 @@ func main() {
 			packageNames = append(packageNames, fullDir...)
 		}
 
-		logger.Debug("packageNames :: ", packageNames)
-
 		// store arifact jar & pom
 		// key = artifact name prefix without extenstion like com.traveloka.common/accessor-1.0.2
 		// []string all files dir
 		artifacts := make(map[string][]string)
-
-		// get specific directory for scanning artifact
-		//packages := filterDir(firtsDirPackageNames, packageName)
-		//logger.Debug("packages result :: ", packages)
 
 		for _, pack := range packageNames {
 			files := getFilesPathFrom(pack)
