@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"path"
 
@@ -34,16 +33,6 @@ func main() {
 	if config.UploadArtifacs {
 		artifactsDirectories, isGradleDir := getArtifactsDir(config)
 
-		// get package name
-		// use `all` to upload all packages
-		// this is used for filter which package you want to upload by using prefix path eg: com or org
-		fmt.Print("\nEnter your package = ")
-		var packageName string
-		_, err = fmt.Scan(&packageName)
-		if err != nil {
-			log.Fatal(err)
-		}
-
 		var packageNames []string
 		var currentDir string
 		for _, artifactsDir := range artifactsDirectories {
@@ -64,10 +53,6 @@ func main() {
 		// key = artifact name prefix without extenstion like com.traveloka.common/accessor-1.0.2
 		// []string all files dir
 		artifacts := make(map[string][]string)
-
-		// get specific directory for scanning artifact
-		//packages := filterDir(firtsDirPackageNames, packageName)
-		//logger.Debug("packages result :: ", packages)
 
 		for _, pack := range packageNames {
 			files := getFilesPathFrom(pack)
