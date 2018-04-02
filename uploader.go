@@ -35,9 +35,9 @@ func upload(s *session.Session, config *Config, buckets []string, artifacts map[
 				wg.Done()
 			}(s, buffer, contentLength, dirForS3, s3Bucket)
 		}
+		wg.Wait()
 	}
 
-	wg.Wait()
 }
 
 // This Will create directory for artifacts so it can be downloaded by gradle
