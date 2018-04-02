@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 
 	"github.com/Gujarats/logger"
 	"github.com/aws/aws-sdk-go/aws"
@@ -14,21 +15,29 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
+var wg sync.WaitGroup
+
 // pass buckets to uploader to start uploading
 func upload(s *session.Session, config *Config, buckets []string, artifacts map[string][]string, isGradleDir bool) {
 	for _, artifact := range artifacts {
 		s3Bucket := nextS3(buckets)
 		for _, fileDir := range artifact {
 			buffer, contentLength := getFileSize(fileDir)
-
 			dirForS3 := dirBuilderForS3(isGradleDir, fileDir)
 
-			err := addFileToS3(s, buffer, contentLength, dirForS3, s3Bucket)
-			if err != nil {
-				log.Fatal(err)
-			}
+			wg.Add(1)
+			go func(s *session.Session, buffer []byte, contentLength int64, fileDir string, s3Bucket string) {
+
+				err := addFileToS3(s, buffer, contentLength, dirForS3, s3Bucket)
+				if err != nil {
+					log.Fatal(err)
+				}
+				wg.Done()
+			}(s, buffer, contentLength, dirForS3, s3Bucket)
 		}
 	}
+
+	wg.Wait()
 }
 
 // This Will create directory for artifacts so it can be downloaded by gradle
@@ -70,15 +79,17 @@ func getFileSize(fileDir string) ([]byte, int64) {
 	// Open the file for use
 	file, err := os.Open(fileDir)
 	if err != nil {
+		logger.Debug("error :: ", err)
 		log.Fatal(err)
 	}
-	defer file.Close()
+	//defer file.Close()
 
 	// Get file size and read the file content into a buffer
 	fileInfo, _ := file.Stat()
 	contentLength = fileInfo.Size()
 	buffer := make([]byte, contentLength)
 	file.Read(buffer)
+	file.Close()
 
 	return buffer, contentLength
 }
@@ -111,9 +122,9 @@ func addFileToS3(s *session.Session, buffer []byte, contentLength int64, fileDir
 		})
 
 		return err
+	} else {
+		logger.Debug("fileDir skipped :: ", fileDir)
 	}
-
-	logger.Debug("fileDir skipped :: ", fileDir)
 
 	return nil
 }
